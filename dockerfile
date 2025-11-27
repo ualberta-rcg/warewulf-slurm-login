@@ -255,7 +255,9 @@ RUN mkdir -p /slurm-debs && \
     rm -rf /slurm-debs && \
     mv /tmp/keep-debs /slurm-debs
 
-RUN dpkg -i /slurm-debs/*.deb || (echo "⚠️ dpkg failed, attempting fix..." && apt-get install -f -y)
+RUN dpkg -i /slurm-debs/*.deb || (echo "⚠️ dpkg failed, attempting fix..." && apt-get install -f -y --no-install-recommends) && \
+    apt-mark hold slurmd 2>/dev/null || true && \
+    apt-get remove -y slurmd 2>/dev/null || true
 
 # --- 10. Configure Autologin based on DISABLE_AUTOLOGIN ---
 RUN if [ "$DISABLE_AUTOLOGIN" != "true" ]; then \
